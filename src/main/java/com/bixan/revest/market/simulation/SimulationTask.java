@@ -23,6 +23,8 @@ import com.bixan.revest.stat.DailyMarket;
 public class SimulationTask implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(SimulationTask.class);
 	
+	private DailyMarket dailyMarket = new DailyMarket();
+	
 	public enum TaskStatus {
 		NOT_STARTED,
 		RUNNING,
@@ -33,8 +35,6 @@ public class SimulationTask implements Runnable {
 	private HouseholdRetirement house = null;
 	private SimulationRun simRun = null;
 	private TaskStatus status = TaskStatus.NOT_STARTED;
-	
-	DailyMarket dailyMarket = new DailyMarket();
 	
 	public SimulationTask(HouseholdRetirement house, SimulationRun simRun) {
 		this.house = house;

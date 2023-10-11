@@ -60,6 +60,9 @@ public class SimulatedReturn {
 	
 	private Vector<Double> dailyRates = new Vector<Double>();
 	
+	@Autowired
+	private DailyMarket dailyMarket;
+	
 	
 	static {
 		daddyRand.reSeed(System.currentTimeMillis());

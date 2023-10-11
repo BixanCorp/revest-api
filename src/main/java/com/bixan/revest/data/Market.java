@@ -5,6 +5,7 @@ package com.bixan.revest.data;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -15,12 +16,15 @@ import java.util.Set;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
+import com.bixan.revest.core.Constant.Data;
 import com.bixan.revest.core.Constant.MarketIndex;
 import com.bixan.revest.util.FileUtil;
 
@@ -33,6 +37,8 @@ import lombok.NoArgsConstructor;
 @Component
 @NoArgsConstructor
 public class Market {
+	private static final Logger log = LoggerFactory.getLogger(Market.class);
+	
 	private static final String YEAR_HEADER_NAME = "YEAR";
 	private static final String RETURN_HEADER_NAME = "RETURN";
 	
@@ -45,44 +51,42 @@ public class Market {
 	FileUtil fileUtil;
 	
 	private void loadData(MarketIndex dataKey, String csvPath) {
+		/*
 		File f = new File(csvPath);
 		if (!f.exists() || !f.isFile()) {
 			System.err.println(String.format("Cannot access %s", csvPath));
 			System.exit(1);
 		}
+		*/
 		
-		CSVParser csv = null;
-		try {
-			csv = CSVParser.parse(f, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames());
-		} catch (IOException e) {
-			System.err.println(String.format("Cannot read CSV file %s", csvPath));
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		Map<String, Integer> headerMap = csv.getHeaderMap();		
-		if (null == headerMap) {
-			System.err.println(String.format("Could not read the header map for %s", csvPath));
-			System.exit(1);
-		}
-		
-		if (!isValid(headerMap)) {
-			System.err.println(String.format("The file %s is not valid", csvPath));
-			System.exit(1);
-		}
-		
-		ArrayList<MarketData> table = iterate(csv);
-		if (null != table) {
-			DATA_TABLE.put(dataKey, table);
-		}
-		
-		if (null != csv && !csv.isClosed()) {
-			try {
-				csv.close();
+		try (InputStream csvStream = Market.class.getResourceAsStream(csvPath)) {
+			try (CSVParser csv = CSVParser.parse(csvStream, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames())) {
+				Map<String, Integer> headerMap = csv.getHeaderMap();		
+				if (null == headerMap) {
+					System.err.println(String.format("Could not read the header map for %s", csvPath));
+					System.exit(1);
+				}
+				
+				if (!isValid(headerMap)) {
+					System.err.println(String.format("The file %s is not valid", csvPath));
+					System.exit(1);
+				}
+				
+				ArrayList<MarketData> table = iterate(csv);
+				if (null != table) {
+					DATA_TABLE.put(dataKey, table);
+				}
+				
+				//csv = CSVParser.parse(f, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames());
 			} catch (IOException e) {
-				System.err.println("Could not close CSV parser. Ignoring");
+				log.error(String.format("Cannot read CSV file %s", csvPath));
+				e.printStackTrace();
+				System.exit(-1);
 			}
-			csv = null;
+		} catch (IOException e1) {
+			log.error(e1.getMessage());
+			e1.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	
@@ -148,9 +152,12 @@ public class Market {
 		
 		if (null == data) {
 			//loadData(dataType, Configurator.getDataPath() + File.separator + dataType.toString().toLowerCase() + ".csv");
-			File csv = fileUtil.getFileFromResource(dataType.toString().toLowerCase() + ".csv");
+			// File csv = fileUtil.getFileFromResource(dataType.toString().toLowerCase() + ".csv");
 			
-			loadData(dataType, csv.getAbsolutePath());
+			// loadData(dataType, csv.getAbsolutePath());
+			
+			String csvPath = Data.LOCATION + dataType.toString().toLowerCase() + ".csv";
+			loadData(dataType, csvPath);
 		}
 		
 		return DATA_TABLE.get(dataType);

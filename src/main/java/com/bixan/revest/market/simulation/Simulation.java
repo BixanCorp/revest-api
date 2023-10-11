@@ -25,6 +25,9 @@ public class Simulation {
 	@Autowired
 	Pool pool;
 	
+	@Autowired
+	HouseholdRetirement household;
+	
 	private HouseholdRetirement origHouse;
 	private Object lock = new Object();
 	

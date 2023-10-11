@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 
 import org.apache.commons.math3.stat.correlation.Covariance;
+import org.springframework.stereotype.Service;
 
 import com.bixan.revest.core.Constant.RatePolicy;
 import com.bixan.revest.core.Constant.Retirement;
@@ -20,6 +21,7 @@ import lombok.NoArgsConstructor;
  *
  */
 @NoArgsConstructor
+@Service
 public class HouseholdRetirement {
 	private Person[] persons = null;
 	private Account[] accounts = null;

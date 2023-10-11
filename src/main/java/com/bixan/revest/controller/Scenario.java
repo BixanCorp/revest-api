@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +40,7 @@ import com.bixan.revest.market.Return;
  */
 @RestController
 @RequestMapping("/account")
+@CrossOrigin
 public class Scenario {
 	@GetMapping(value = "/best/{num}/{market:.*}", produces = "application/json")
 	public String bestYears(@PathVariable("num") int num, @PathVariable("market") String market) throws IOException {

@@ -5,6 +5,7 @@ package com.bixan.revest.stat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.stat.StatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.bixan.revest.core.Constant.Data;
@@ -57,7 +59,7 @@ public class DailyMarket {
 	private StatDist dist = null;
 	
 	private static Hashtable<String, DailyMarket> mktTable = new Hashtable<String, DailyMarket>();
-	
+		
 	
 	private DailyMarket(MarketIndex mkt, StatDist dist) throws IOException {
 		this.mktIdx = mkt;
@@ -76,6 +78,8 @@ public class DailyMarket {
 			dailyFileName = Data.RUSSELL3000_DAILY_FILE;
 			break;
 		}
+		
+		dailyFileName = Data.LOCATION + dailyFileName;
 		
 		loadAndParse();
 		this.calculateMLE(dist);
@@ -113,44 +117,48 @@ public class DailyMarket {
 	}
 	
 	private void loadAndParse() throws IOException {
-		File csvFile = FileUtil.getFileFromResource(this.dailyFileName);
+		//File csvFile = FileUtil.getFileFromResource(this.dailyFileName);
 		// String csvPath = Configurator.getDataPath() + File.separatorChar + this.dailyFileName;
-		String csvPath = csvFile.getAbsolutePath();
+		//String csvPath = csvFile.getAbsolutePath();
 		
-		File f = new File(csvPath);
-		if (!f.exists() || !f.isFile()) {
-			System.err.println(String.format("Cannot access %s", csvPath));
-			System.exit(1);
-		}
+		try (InputStream csvStream = DailyMarket.class.getResourceAsStream(this.dailyFileName)) {
 		
-		try {
-			csv = CSVParser.parse(f, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames());
-		} catch (IOException e) {
-			System.err.println(String.format("Cannot read CSV file %s", csvPath));
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		Map<String, Integer> headerMap = csv.getHeaderMap();		
-		if (null == headerMap) {
-			System.err.println(String.format("Could not read the header map for %s", csvPath));
-			System.exit(1);
-		}
-		
-		if (!isValid(headerMap)) {
-			System.err.println(String.format("The file %s is not valid", csvPath));
-			System.exit(1);
-		}
-		
-		iterate(csv);
-		
-		if (null != csv && !csv.isClosed()) {
+//			File f = new File(csvPath);
+//			if (!f.exists() || !f.isFile()) {
+//				System.err.println(String.format("Cannot access %s", csvPath));
+//				System.exit(1);
+//			}
+			
 			try {
-				csv.close();
+				csv = CSVParser.parse(csvStream, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames());
+				// csv = CSVParser.parse(f, Charset.forName("UTF-8"), CSVFormat.DEFAULT.withHeader().withAllowMissingColumnNames());
 			} catch (IOException e) {
-				System.err.println("Could not close CSV parser. Ignoring");
+				System.err.println(String.format("Cannot read CSV file %s", this.dailyFileName));
+				e.printStackTrace();
+				System.exit(-1);
 			}
-			csv = null;
+			
+			Map<String, Integer> headerMap = csv.getHeaderMap();		
+			if (null == headerMap) {
+				System.err.println(String.format("Could not read the header map for %s", this.dailyFileName));
+				System.exit(1);
+			}
+			
+			if (!isValid(headerMap)) {
+				System.err.println(String.format("The file %s is not valid", this.dailyFileName));
+				System.exit(1);
+			}
+			
+			iterate(csv);
+			
+			if (null != csv && !csv.isClosed()) {
+				try {
+					csv.close();
+				} catch (IOException e) {
+					System.err.println("Could not close CSV parser. Ignoring");
+				}
+				csv = null;
+			}
 		}
 	}
 	

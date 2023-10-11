@@ -43,7 +43,7 @@ public class Constant {
 	}
 	
 	public static class Data {
-		public static final String LOCATION = "data.location";
+		public static final String LOCATION = "/static/data/";
 		public static final String SP500_DAILY_FILE = "sp500_daily.csv";
 		public static final String DOWJONES_DAILY_FILE = "dowjones_daily.csv";
 		public static final String RUSSELL2000_DAILY_FILE = "russell2000_daily.csv";
@@ -96,7 +96,7 @@ public class Constant {
 	}
 	
 	public static class SimulationConf {
-		public static final int DEFAULT_RUN_COUNT = 5000;
+		public static final int DEFAULT_RUN_COUNT = 500;
 		public static final int DAYS_IN_YEAR = 252;		// how many days stock-market open in an year
 	}
 }
