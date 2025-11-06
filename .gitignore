@@ -39,6 +39,7 @@ build/
 .env.test
 .env.prod
 .env.local
+.env.localdev
 .env.*.local
 
 # Keep example files for reference
