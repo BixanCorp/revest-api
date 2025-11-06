@@ -1,5 +1,6 @@
 package com.bixan.revest.conf;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -16,25 +17,37 @@ public class CorsConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(CorsConfiguration.class);
 	
 	@Value("${cors.allowed.origin}")
-	private List<String> allowedOrigins;
+	private String allowedOrigin;
 
 	@PostConstruct
 	private void init() {
 		log.info("Initializing CorsConfiguration class");
+		log.info("CORS allowed origin value: '{}'", allowedOrigin);
 	}
 
 	/**
-	 * @return the allowedOrigins
+	 * @return the allowedOrigins as a single item list
 	 */
 	public List<String> getAllowedOrigins() {
-		return allowedOrigins;
+		if (allowedOrigin == null || allowedOrigin.trim().isEmpty()) {
+			log.warn("CORS allowedOrigin is null or empty, using default localhost:3000");
+			return Arrays.asList("http://localhost:3000");
+		}
+		return Arrays.asList(allowedOrigin);
 	}
 
 	/**
-	 * @param allowedOrigins the allowedOrigins to set
+	 * @return the allowedOrigin
 	 */
-	public void setAllowedOrigins(List<String> allowedOrigins) {
-		this.allowedOrigins = allowedOrigins;
+	public String getAllowedOrigin() {
+		return allowedOrigin;
+	}
+
+	/**
+	 * @param allowedOrigin the allowedOrigin to set
+	 */
+	public void setAllowedOrigin(String allowedOrigin) {
+		this.allowedOrigin = allowedOrigin;
 	}
 
 	

@@ -20,62 +20,67 @@ import com.bixan.revest.conf.CorsConfiguration;
 @SpringBootApplication
 public class RevestApplication {
 	private static final Logger log = LoggerFactory.getLogger(RevestApplication.class);
-	
-	@Autowired
+
+	@Autowired(required = false)
 	CorsConfiguration corsConfig;
 
-	
 	public static void main(String[] args) {
 		SpringApplication.run(RevestApplication.class, args);
 	}
 
 	@Component
-    public class ProjectRunner implements ApplicationRunner {
+	public class ProjectRunner implements ApplicationRunner {
 
-        public ProjectRunner(ApplicationArguments args) {
-        	/*
-            boolean debug = args.containsOption("debug");
-            List<String> files = args.getNonOptionArgs();
-            if (debug) {
-                System.out.println(files);
-            }
-            // if run with "--debug logfile.txt" prints ["logfile.txt"]
-             */
-        }
+		public ProjectRunner(ApplicationArguments args) {
+			/*
+			 * boolean debug = args.containsOption("debug");
+			 * List<String> files = args.getNonOptionArgs();
+			 * if (debug) {
+			 * System.out.println(files);
+			 * }
+			 * // if run with "--debug logfile.txt" prints ["logfile.txt"]
+			 */
+		}
 
 		@Override
 		public void run(ApplicationArguments args) throws Exception {
 			System.out.println("ApplicationRunner.run() called");
-			//transfer.start();
+			// transfer.start();
 		}
-    }
-    
-    @Component
-    public class ProjectCommandLineRunner implements CommandLineRunner {
+	}
 
-        @Override
-        public void run(String... args) {
-            System.out.println("CommandLineRunner.run() called");
-        }
-    }
-    
-    @Bean
+	@Component
+	public class ProjectCommandLineRunner implements CommandLineRunner {
+
+		@Override
+		public void run(String... args) {
+			System.out.println("CommandLineRunner.run() called");
+		}
+	}
+
+	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				String[] origins = corsConfig.getAllowedOrigins().toArray(new String[]{});
-				
+				String[] origins;
+				if (corsConfig != null) {
+					origins = corsConfig.getAllowedOrigins().toArray(new String[] {});
+				} else {
+					// Default CORS configuration for tests
+					origins = new String[] { "http://localhost:3000" };
+				}
+
 				log.info("Allowed origins: {}", String.join(",", origins));
-				
+
 				registry.addMapping("/**")
-					//.allowedOrigins("https://domain2.com")
-					.allowedOriginPatterns(origins)
-					.allowedMethods("GET", "POST", "PATCH", "OPTIONS", "PUT")
-					.allowedHeaders("*")
-					//.exposedHeaders("header1", "header2")
-					.allowCredentials(true)
-					.maxAge(3600);
+						// .allowedOrigins("https://domain2.com")
+						.allowedOriginPatterns(origins)
+						.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+						.allowedHeaders("*")
+						// .exposedHeaders("header1", "header2")
+						.allowCredentials(true)
+						.maxAge(3600);
 			}
 		};
 	}

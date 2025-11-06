@@ -26,23 +26,23 @@
 	</appender>
 
 	<springProfile name="localdev | dev | test">
-		<logger name="com.bixan.songinfo.controller" level="trace" additivity="false">
+		<logger name="com.bixan.revest.controller" level="trace" additivity="false">
 			<appender-ref ref="FILE" />
 			<appender-ref ref="STDOUT" />
 		</logger>
-		<logger name="com.bixan.songinfo.client" level="debug" additivity="false">
+		<logger name="com.bixan.revest.auth" level="debug" additivity="false">
 			<appender-ref ref="FILE" />
 			<appender-ref ref="STDOUT" />
 		</logger>
-		<logger name="com.bixan.songinfo.concurrency" level="debug" additivity="false">
+		<logger name="com.bixan.revest.config.RequestResponseLoggingFilter" level="info" additivity="false">
 			<appender-ref ref="FILE" />
 			<appender-ref ref="STDOUT" />
 		</logger>
-		<logger name="com.bixan.songinfo.interceptor" level="debug" additivity="false">
+		<logger name="com.bixan.revest.interceptor" level="debug" additivity="false">
 			<appender-ref ref="FILE" />
 			<appender-ref ref="STDOUT" />
 		</logger>
-		<logger name="com.bixan.songinfo.operations" level="debug" additivity="false">
+		<logger name="com.bixan.revest.operations" level="debug" additivity="false">
 			<appender-ref ref="FILE" />
 			<appender-ref ref="STDOUT" />
 		</logger>
